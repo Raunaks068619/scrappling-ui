@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { JsonView } from "./JsonView";
+import { MarkdownView } from "./MarkdownView";
 import styles from "./ResultPanel.module.css";
 import { CopyIcon, ExternalIcon } from "./icons/ScraplingMark";
 import { Tabs } from "./Tabs";
@@ -137,11 +139,11 @@ export function ResultPanel({ state, result, lastSubmittedUrl }: Props) {
                 <div className={styles.codeBlockWrap}>
                   <div className={styles.codeToolbar}>
                     <span className={`${styles.codeMeta} mono`}>
-                      {jsonStr.length.toLocaleString()} chars
+                      {jsonStr.length.toLocaleString()} chars · click ▸ to expand
                     </span>
                     <CopyButton text={jsonStr} />
                   </div>
-                  <pre className={styles.codeBlock}><code>{jsonStr}</code></pre>
+                  <JsonView data={result} />
                 </div>
               ),
             },
@@ -156,7 +158,7 @@ export function ResultPanel({ state, result, lastSubmittedUrl }: Props) {
                     </span>
                     <CopyButton text={result.markdown} />
                   </div>
-                  <pre className={styles.codeBlock}><code>{result.markdown}</code></pre>
+                  <MarkdownView source={result.markdown} />
                 </div>
               ),
             },

@@ -1,0 +1,119 @@
+.root {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--fg);
+  background: var(--surface);
+  padding: 14px 16px;
+  max-height: 560px;
+  overflow: auto;
+}
+
+.container {
+  display: block;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  min-height: 21px;
+  gap: 0;
+}
+
+.caret {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-right: 2px;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--muted);
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+
+.caret:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.caretOpen {
+  transform: rotate(90deg);
+}
+
+.caretSpacer {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 16px;
+}
+
+.key {
+  color: var(--fg);
+  font-weight: 510;
+}
+
+.str {
+  color: #1a5d3a;          /* deep moss — quiet, not "Christmas red-green" */
+  word-break: break-word;
+}
+
+.num {
+  color: #1a4480;          /* deep slate — not indigo */
+}
+
+.bool {
+  color: #6b3fa0;
+  font-weight: 510;
+}
+
+.nullVal {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.punct {
+  color: var(--muted);
+}
+
+.gap {
+  display: inline-block;
+  width: 6px;
+}
+
+.summary,
+.expandInline,
+.collapseInline {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 1px 8px;
+  margin: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.summary:hover,
+.expandInline:hover,
+.collapseInline:hover {
+  background: var(--bg);
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+
+/* Dark-text on light bg already passes WCAG; values shifted toward lower-saturation hues. */

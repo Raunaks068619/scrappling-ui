@@ -1,0 +1,191 @@
+.wrap {
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggle {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 510;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.toggle:hover {
+  color: var(--fg);
+}
+
+.toggleActive {
+  color: var(--fg);
+  background: var(--bg);
+}
+
+/* ---------------------------------------------------------------------------
+   Rendered output — restrained editorial typography on the same substrate.
+   --------------------------------------------------------------------------- */
+
+.rendered {
+  padding: 22px 28px 28px;
+  max-height: 560px;
+  overflow: auto;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--fg);
+}
+
+.rendered > :first-child {
+  margin-top: 0;
+}
+
+.rendered > :last-child {
+  margin-bottom: 0;
+}
+
+.rendered h1,
+.rendered h2,
+.rendered h3,
+.rendered h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 28px 0 12px;
+  color: var(--fg);
+}
+
+.rendered h1 { font-size: 28px; letter-spacing: -0.025em; }
+.rendered h2 { font-size: 22px; }
+.rendered h3 { font-size: 18px; }
+.rendered h4 { font-size: 16px; font-weight: 510; }
+
+.rendered p {
+  margin: 0 0 14px;
+  max-width: 70ch;
+}
+
+.rendered a {
+  color: var(--fg);
+  border-bottom: 1px solid var(--border-strong);
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+
+.rendered a:hover {
+  border-bottom-color: var(--fg);
+}
+
+.rendered ul,
+.rendered ol {
+  margin: 0 0 14px;
+  padding-left: 24px;
+}
+
+.rendered li {
+  margin: 4px 0;
+  max-width: 70ch;
+}
+
+.rendered blockquote {
+  margin: 14px 0;
+  padding: 6px 0 6px 18px;
+  border-left: 2px solid var(--border-strong);
+  color: var(--muted);
+  font-style: italic;
+  max-width: 70ch;
+}
+
+.rendered code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.rendered pre {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: auto;
+}
+
+.rendered pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.rendered hr {
+  margin: 22px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.rendered table {
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.rendered th,
+.rendered td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rendered th {
+  background: var(--bg);
+  font-weight: 510;
+}
+
+.img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  margin: 10px 0;
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   Source view — raw markdown, monospace.
+   --------------------------------------------------------------------------- */
+
+.source {
+  margin: 0;
+  padding: 16px 18px;
+  max-height: 560px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fg);
+  background: var(--surface);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
