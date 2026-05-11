@@ -14,12 +14,13 @@ export function Footer() {
             className={styles.brandedLink}
           >
             <Image
-              src="/scrapling-cover.svg"
+              src="/scrapling-mark.png"
               alt="Scrapling"
-              width={88}
+              width={20}
               height={20}
               className={styles.scraplingLogo}
             />
+            <span className={styles.scraplingName}>Scrapling</span>
           </a>
         </p>
         <p className={styles.right}>

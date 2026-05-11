@@ -19,13 +19,14 @@ export function TopBar() {
             className={styles.brandedLink}
           >
             <Image
-              src="/scrapling-cover.svg"
+              src="/scrapling-mark.png"
               alt="Scrapling"
-              width={88}
-              height={20}
+              width={24}
+              height={24}
               priority
               className={styles.scraplingLogo}
             />
+            <span className={styles.scraplingName}>Scrapling</span>
           </a>
           <span className={styles.sep}>·</span>
           <span>Stealthy</span>

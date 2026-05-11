@@ -1,6 +1,6 @@
 .hero {
   text-align: center;
-  padding: clamp(64px, 9vw, 120px) 24px 32px;
+  padding: 64px 24px 32px;
   max-width: 880px;
   margin: 0 auto;
   /* Entry animation: blur+lift, springy. */
