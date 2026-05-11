@@ -1,0 +1,160 @@
+.form {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+  animation: form-in var(--dur-slow) var(--ease-spring) 100ms both;
+}
+
+@keyframes form-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 6px 6px 6px 22px;
+  transition:
+    border-color var(--dur-mid) var(--ease-standard),
+    box-shadow var(--dur-mid) var(--ease-standard);
+}
+
+.pill:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus); /* accent use #1 */
+}
+
+.pillInvalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 4px var(--danger-soft);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: 0;
+  padding: 14px 0;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+}
+
+.input::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+/* Submit pill — button-in-button, circular arrow slot. Accent use #2. */
+.submit {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 18px;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 510;
+  letter-spacing: -0.005em;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.submit:disabled {
+  background: color-mix(in srgb, var(--accent) 45%, #fff);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.submitLabel {
+  display: inline-block;
+}
+
+.submitCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.submit:hover:not(:disabled) .submitCircle {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* Hint row */
+.hint {
+  margin-top: 14px;
+  min-height: 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hintError {
+  color: var(--danger);
+  font-weight: 510;
+}
+
+.hintShortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted-strong);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
+
+@media (max-width: 560px) {
+  .submitLabel {
+    display: none;
+  }
+  .submit {
+    padding: 8px;
+  }
+  .pill {
+    padding-left: 18px;
+  }
+  .input {
+    font-size: 16px; /* avoid iOS zoom */
+  }
+}

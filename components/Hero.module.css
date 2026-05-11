@@ -1,0 +1,50 @@
+.hero {
+  text-align: center;
+  padding: clamp(64px, 9vw, 120px) 24px 32px;
+  max-width: 880px;
+  margin: 0 auto;
+  /* Entry animation: blur+lift, springy. */
+  animation: hero-in var(--dur-slow) var(--ease-spring) both;
+}
+
+.eyebrow {
+  margin: 0 0 22px;
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 7.5vw, 92px);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  margin: 0 0 22px;
+  color: var(--fg);
+}
+
+.lede {
+  margin: 0 auto;
+  text-align: center;
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    animation: hero-fade var(--dur-mid) linear both;
+  }
+  @keyframes hero-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
