@@ -1,6 +1,6 @@
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
-import { scrapeViaBoltic, scrapeViaSidecar } from "@/lib/scrape-client";
+import { looksBlocked, scrapeViaBoltic, scrapeViaJina, scrapeViaSidecar } from "@/lib/scrape-client";
 import type { ScrapeResult } from "@/lib/types";
 import { normalizeUrl } from "@/lib/validate-url";
 
@@ -46,9 +46,18 @@ export async function POST(req: NextRequest): Promise<NextResponse<ScrapeResult>
 
   // Use the sidecar only when explicitly opted into via PREFER_SIDECAR=1 (local dev).
   const preferSidecar = process.env.PREFER_SIDECAR === "1";
-  const result: ScrapeResult = preferSidecar
+  let result: ScrapeResult = preferSidecar
     ? await scrapeViaSidecar(url, path.join(process.cwd(), "scraper", "scrape.py"))
     : await scrapeViaBoltic(url, backend, token);
+
+  // Fallback to Jina Reader on detected WAF blocks (Myntra/Flipkart/Akamai
+  // datacenter blocks). Stealth browsers can't bypass IP-reputation rejection;
+  // Jina has its own residential infrastructure that bypasses it for us.
+  if (result.ok && looksBlocked(result)) {
+    const jina = await scrapeViaJina(url);
+    if (jina.ok) result = jina;
+    // If Jina also fails, keep the Boltic result so the user sees the original block page.
+  }
 
   // Always return 200 with the discriminated union so the client owns rendering.
   return NextResponse.json<ScrapeResult>(result, { status: 200 });

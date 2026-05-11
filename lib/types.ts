@@ -6,7 +6,8 @@ export type ScrapeRequest = { url: string };
 export type ScrapeFetcher =
   | "StealthyFetcher"
   | "PlayWrightFetcher"
-  | "Fetcher";
+  | "Fetcher"
+  | "JinaReader";
 
 export type ScrapeSuccess = {
   ok: true;

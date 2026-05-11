@@ -1,8 +1,135 @@
 import { spawn } from "node:child_process";
 import { enrichFromHtml } from "./enrich";
-import type { ScrapeFetcher, ScrapeResult } from "./types";
+import type { ScrapeFetcher, ScrapeResult, ScrapeSuccess } from "./types";
 
 const HARD_TIMEOUT_MS = 30_000;
+
+// ---------------------------------------------------------------------------
+// Heuristic: did the upstream return a WAF stub instead of the real page?
+//
+// Myntra/Flipkart/Akamai-fronted sites serve a 400-byte "Site Maintenance /
+// Oops! Something went wrong" page when they detect a datacenter IP. Stealth
+// browsers can't fix this because the block lands on IP reputation *before*
+// the fingerprint check.
+// ---------------------------------------------------------------------------
+
+const BLOCK_PATTERNS = [
+  /site maintenance/i,
+  /access denied/i,
+  /are you a human/i,
+  /please verify you are/i,
+  /attention required.*cloudflare/i,
+  /just a moment\.\.\./i,
+  /oops!?\s+something went wrong/i,
+  /please contact your administrator/i,
+  /pardon our interruption/i,
+  /request blocked/i,
+  /enable javascript and cookies to continue/i,
+];
+
+export function looksBlocked(result: ScrapeSuccess): boolean {
+  const html = result.html ?? "";
+  // Real pages are usually multi-KB; WAF stubs are 200-2000 bytes.
+  const tooSmall = html.length < 2_000;
+  const titleSuspicious =
+    result.title !== null && /maintenance|oops|denied|forbidden|blocked|verify/i.test(result.title);
+  const bodySuspicious = BLOCK_PATTERNS.some((re) => re.test(html));
+  return (tooSmall && (titleSuspicious || bodySuspicious)) || bodySuspicious;
+}
+
+// ---------------------------------------------------------------------------
+// Jina Reader fallback — r.jina.ai/<url> returns clean markdown.
+// Free tier: 200 RPM, no auth. Set JINA_API_KEY for higher limits.
+// ---------------------------------------------------------------------------
+
+const LINK_RE = /\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+const IMAGE_RE = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+
+export async function scrapeViaJina(url: string): Promise<ScrapeResult> {
+  const endpoint = "https://r.jina.ai/" + url;
+  const headers: Record<string, string> = { accept: "text/plain" };
+  if (process.env.JINA_API_KEY) headers.authorization = `Bearer ${process.env.JINA_API_KEY}`;
+
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), HARD_TIMEOUT_MS);
+
+  let resp: Response;
+  try {
+    resp = await fetch(endpoint, { headers, signal: controller.signal });
+  } catch (err) {
+    clearTimeout(t);
+    const isAbort = err instanceof Error && err.name === "AbortError";
+    return {
+      ok: false,
+      code: isAbort ? "TIMEOUT" : "FETCH_FAILED",
+      message: isAbort
+        ? "Jina Reader took longer than 30 seconds."
+        : "Couldn't reach Jina Reader.",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+  clearTimeout(t);
+
+  if (!resp.ok) {
+    return {
+      ok: false,
+      code: "FETCH_FAILED",
+      message: `Jina Reader returned ${resp.status}. The site may also be blocking residential proxies.`,
+    };
+  }
+
+  const text = await resp.text();
+  // Jina format: "Title: ...\nURL Source: ...\n\nMarkdown Content:\n<markdown>"
+  const titleMatch = text.match(/^Title:\s*(.+)$/m);
+  const urlMatch = text.match(/^URL Source:\s*(.+)$/m);
+  const mdStart = text.indexOf("Markdown Content:");
+  const markdown = mdStart >= 0 ? text.slice(mdStart + "Markdown Content:".length).replace(/^\s*\n/, "") : text;
+
+  // Extract links + images from the markdown (deduped, capped).
+  const seenLinks = new Set<string>();
+  const links: ScrapeSuccess["links"] = [];
+  for (const m of markdown.matchAll(LINK_RE)) {
+    if (links.length >= 200) break;
+    const href = (m[2] ?? "").trim();
+    if (!href || href.startsWith("#") || seenLinks.has(href)) continue;
+    seenLinks.add(href);
+    links.push({ href, text: (m[1] ?? "").trim().slice(0, 200) });
+  }
+  const seenImgs = new Set<string>();
+  const images: ScrapeSuccess["images"] = [];
+  for (const m of markdown.matchAll(IMAGE_RE)) {
+    if (images.length >= 50) break;
+    const src = (m[2] ?? "").trim();
+    if (!src || seenImgs.has(src)) continue;
+    seenImgs.add(src);
+    const alt = (m[1] ?? "").trim();
+    images.push({ src, alt: alt || null });
+  }
+
+  // Plain text: strip the most common markdown syntax for the "text" field.
+  const plain = markdown
+    .replace(IMAGE_RE, "")
+    .replace(LINK_RE, "$1")
+    .replace(/^#+\s+/gm, "")
+    .replace(/[*_`>]+/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  return {
+    ok: true,
+    finalUrl: (urlMatch?.[1] ?? url).trim(),
+    status: 200,
+    title: titleMatch ? titleMatch[1]!.trim() : null,
+    description: null,
+    text: plain,
+    markdown,
+    html: "", // Jina doesn't return raw HTML
+    links,
+    images,
+    fetchedAt: new Date().toISOString(),
+    fetcher: "JinaReader",
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Production path — proxy to the Boltic deployment that runs Scrapling.
