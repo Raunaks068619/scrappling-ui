@@ -1,0 +1,174 @@
+# Scrappling Agent Guide
+
+> Use this file when an AI agent needs to scrape a public URL through Scrappling and return structured content.
+
+Scrappling exposes a simple scraping API for public web pages. The easiest route for agents is the frontend proxy:
+
+```text
+POST /api/scrape
+Content-Type: application/json
+```
+
+```json
+{
+  "url": "https://example.com/article"
+}
+```
+
+The response is always JSON. The API returns HTTP 200 for both success and handled errors; inspect the `ok` field.
+
+## When to use Scrappling
+
+Use Scrappling when you need:
+
+- Clean visible text from a public page.
+- Markdown converted from the fetched page.
+- Page metadata such as title, status, links, and images.
+- A single URL scrape from an agent workflow.
+
+Do not use Scrappling for:
+
+- Private pages, logged-in pages, or user data.
+- Paywall, CAPTCHA, or access-control bypass.
+- High-rate crawling without permission.
+- Actions that violate a site's terms or robots policy.
+
+## Quick examples
+
+### cURL
+
+```bash
+curl -s -X POST "https://YOUR_SCRAPPLING_HOST/api/scrape" \
+  -H "content-type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
+
+### JavaScript
+
+```js
+const response = await fetch("https://YOUR_SCRAPPLING_HOST/api/scrape", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com" }),
+});
+
+const result = await response.json();
+if (result.ok) {
+  console.log(result.markdown);
+} else {
+  console.error(result.code, result.message);
+}
+```
+
+### Python
+
+```python
+import requests
+
+response = requests.post(
+    "https://YOUR_SCRAPPLING_HOST/api/scrape",
+    json={"url": "https://example.com"},
+    timeout=60,
+)
+result = response.json()
+
+if result["ok"]:
+    print(result["markdown"])
+else:
+    raise RuntimeError(f'{result["code"]}: {result["message"]}')
+```
+
+## Success response
+
+```ts
+type ScrapeSuccess = {
+  ok: true;
+  finalUrl: string;
+  status: number;
+  title: string | null;
+  description: string | null;
+  text: string;
+  markdown: string;
+  html: string;
+  links: { href: string; text: string }[];
+  images: { src: string; alt: string | null }[];
+  fetchedAt: string;
+  fetcher: "StealthyFetcher" | "PlayWrightFetcher" | "Fetcher" | "JinaReader";
+};
+```
+
+Prefer `markdown` for agent context. Use `text` for compact summaries. Use `links` and `images` when you need page references or media candidates.
+
+## Error response
+
+```ts
+type ScrapeError = {
+  ok: false;
+  code:
+    | "INVALID_URL"
+    | "PYTHON_MISSING"
+    | "SCRAPLING_MISSING"
+    | "TIMEOUT"
+    | "FETCH_FAILED"
+    | "PARSE_FAILED"
+    | "UNKNOWN";
+  message: string;
+  detail?: string;
+};
+```
+
+Retry only when `code` is `TIMEOUT`, `FETCH_FAILED`, or `UNKNOWN`. Do not retry aggressively.
+
+## Behavior notes
+
+- The frontend proxy normalizes URLs and calls the Scrapling backend.
+- Production uses the deployed backend at `https://scrappling-b092deec.serverless.boltic.app` unless configured otherwise.
+- The proxy currently requests the stealth fetcher and HTML return from the backend, then converts the HTML into JSON and Markdown.
+- If the first result looks like a block page, the proxy can fall back to Jina Reader and return `fetcher: "JinaReader"`.
+- The frontend proxy has an approximate 30 second hard timeout per fetch attempt.
+
+## Raw backend API
+
+If you are calling the backend directly, use:
+
+```text
+POST https://scrappling-b092deec.serverless.boltic.app/scrape
+Content-Type: application/json
+```
+
+```json
+{
+  "url": "https://quotes.toscrape.com/",
+  "fetcher": "http",
+  "css": [".quote .text::text", ".author::text"],
+  "xpath": null,
+  "return_html": false,
+  "timeout": 30,
+  "headless": true,
+  "network_idle": false
+}
+```
+
+Raw backend fetchers:
+
+- `http`: Fast plain HTTP fetch.
+- `stealth`: Browser-backed Scrapling fetcher.
+- `dynamic`: Playwright Chromium fetcher.
+
+The backend also exposes `GET /openapi.json` for machine-readable schema discovery.
+
+## Recommended agent workflow
+
+1. Fetch `/llms.txt` first.
+2. Fetch `/llms-full.txt` if you need request and response details.
+3. Call `POST /api/scrape` with one normalized public URL.
+4. Read `result.ok`.
+5. Use `result.markdown` as the primary scraped content.
+6. Cite or store `result.finalUrl` and `result.fetchedAt` with downstream work.
+
+## Related files
+
+- `/llms.txt`: Standard root discovery file.
+- `/agents.md`: Short quick-start instructions.
+- `/skill.md`: Moltbook-style agent skill entry.
+- `/developers.md`: Developer-oriented API entry.

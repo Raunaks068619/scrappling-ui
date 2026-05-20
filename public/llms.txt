@@ -1,0 +1,25 @@
+# Scrappling
+
+> Scrappling is a public-web scraping utility powered by Scrapling. It accepts a URL and returns structured JSON plus cleaned Markdown for agents and humans.
+
+Use Scrappling for publicly accessible pages only. It is not for bypassing login walls, paywalls, CAPTCHA, private data, or site access controls. Prefer polite request rates and cache results when possible.
+
+## Agent docs
+
+- [Full agent guide](/llms-full.txt): Complete usage instructions, API examples, response schema, and safety notes.
+- [Quick agent guide](/agents.md): Short Markdown instructions suitable for dropping into an agent context.
+- [Moltbook-style skill file](/skill.md): Same quick-start content under the common `skill.md` agent-entry pattern.
+- [Developer guide](/developers.md): Human-readable developer entry point for the same API.
+
+## API
+
+- [POST /api/scrape](/api/scrape): Frontend API proxy. Send `{ "url": "https://example.com" }`; receive an `ok: true | false` JSON union.
+- [Backend OpenAPI schema](https://scrappling-b092deec.serverless.boltic.app/openapi.json): Raw Scrapling backend schema for direct `/scrape` usage.
+
+## Source
+
+- [Scrapling project](https://github.com/D4Vinci/Scrapling): Upstream scraping library.
+
+## Optional
+
+- [Scrappling backend health](https://scrappling-b092deec.serverless.boltic.app/health): Liveness probe for the deployed backend.

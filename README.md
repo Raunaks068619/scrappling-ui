@@ -3,6 +3,9 @@
 A single-page Next.js frontend for [Scrapling](https://github.com/D4Vinci/Scrapling).
 Paste a URL → render with the stealth fetcher → JSON + Markdown side by side.
 
+Agent-readable entry points are published at `/llms.txt`, `/llms-full.txt`,
+`/agents.md`, `/skill.md`, and `/developers.md`.
+
 ## Stack
 
 - Next.js 15 App Router · React 19 · TypeScript strict

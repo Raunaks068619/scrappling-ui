@@ -11,6 +11,10 @@ export function TopBar() {
           <AccentDot />
         </a>
         <div className={styles.meta}>
+          <a href="/llms.txt" target="_blank" rel="noreferrer" className={styles.agentLink}>
+            Agent docs
+          </a>
+          <span className={styles.sep}>·</span>
           <span>via</span>
           <a
             href="https://github.com/D4Vinci/Scrapling"

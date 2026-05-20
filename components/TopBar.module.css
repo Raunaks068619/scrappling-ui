@@ -49,7 +49,13 @@
   transition: opacity var(--dur-fast) var(--ease-standard);
 }
 
-.brandedLink:hover {
+.agentLink {
+  color: var(--fg);
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+
+.brandedLink:hover,
+.agentLink:hover {
   opacity: 0.7;
 }
 
@@ -83,5 +89,12 @@
   .scraplingLogo {
     height: 16px;
     width: 16px;
+  }
+  .scraplingName,
+  .meta > span:not(.sep) {
+    display: none;
+  }
+  .sep {
+    display: none;
   }
 }

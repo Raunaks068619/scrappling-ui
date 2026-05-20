@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Footer } from "@/components/Footer";
+import { AgentEntryModal } from "@/components/AgentEntryModal";
 import { Hero } from "@/components/Hero";
 import { ResultPanel } from "@/components/ResultPanel";
 import { ScrapeForm } from "@/components/ScrapeForm";
@@ -50,6 +51,7 @@ export default function Page() {
 
   return (
     <>
+      <AgentEntryModal />
       <TopBar />
       <main>
         <Hero />
